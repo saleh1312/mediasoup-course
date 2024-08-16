@@ -16,9 +16,23 @@ const httpsServer = https.createServer(options, app)
 const socketio = require('socket.io')
 const mediasoup = require('mediasoup')
 
+const config = require('./config/config')
+const createWorkers = require('./createWorkers')
+
 //set up the socketio server, listening by way of our express https sever
 const io = socketio(httpsServer,{
-    cors: ['https://localhost:3030']
+    cors: [`https://localhost:${config.port}`]
 })
 
-httpsServer.listen(3030)
+//init workers, it's where our mediasoup workers will live
+let workers = null
+
+//initMediaSoup gets mediasoup ready to do its thing
+const initMediaSoup = async()=>{
+    workers = await createWorkers()
+    // console.log(workers)
+}
+
+initMediaSoup() //build our mediasoup server/sfu
+
+httpsServer.listen(config.port)
