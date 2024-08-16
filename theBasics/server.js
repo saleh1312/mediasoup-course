@@ -24,13 +24,19 @@ const io = socketio(httpsServer,{
     cors: [`https://localhost:${config.port}`]
 })
 
+//our globals
 //init workers, it's where our mediasoup workers will live
 let workers = null
+// init router, it's where our 1 router will live
+let router = null
 
 //initMediaSoup gets mediasoup ready to do its thing
 const initMediaSoup = async()=>{
     workers = await createWorkers()
     // console.log(workers)
+    router = await workers[0].createRouter({
+        mediaCodecs: config.routerMediaCodecs
+    })
 }
 
 initMediaSoup() //build our mediasoup server/sfu
