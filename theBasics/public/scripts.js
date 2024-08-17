@@ -1,6 +1,7 @@
 
 // Globals
 let socket = null
+let device = null
 
 // connect to the server
 const initConnect = ()=>{
@@ -10,6 +11,16 @@ const initConnect = ()=>{
     connectButton.disabled = true
     // keep the socket listeners in their own place
     addSocketListeners()
+}
+
+const deviceSetup = async()=>{
+    // console.log(mediasoupClient)
+    device = new mediasoupClient.Device();
+    // now let's load it!
+    const routerRtpCapabilities = await socket.emitWithAck('getRtpCap')
+    // console.log(routerRtpCapabilities)
+    await device.load({routerRtpCapabilities })
+//     console.log(device.loaded)
 }
 
 // Socket listners here!
