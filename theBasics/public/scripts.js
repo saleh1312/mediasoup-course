@@ -2,6 +2,8 @@
 // Globals
 let socket = null
 let device = null
+let localStream = null
+let producerTransport = null
 
 // connect to the server
 const initConnect = ()=>{
@@ -21,6 +23,25 @@ const deviceSetup = async()=>{
     // console.log(routerRtpCapabilities)
     await device.load({routerRtpCapabilities })
 //     console.log(device.loaded)
+    deviceButton.disabled = true
+    createProdButton.disabled = false
+}
+
+const createProducer = async()=>{
+    // console.log("Create transport")
+    try{
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+        })
+        console.log(localStream)
+        localVideo.srcObject = localStream
+    }catch(err){
+        console.log("GUM error",err)
+    }
+    //ask the socket.io server (signaling) for transport information
+    const data = await socket.emitWithAck('create-producer-transport')
+    console.log(data)
 }
 
 // Socket listners here!

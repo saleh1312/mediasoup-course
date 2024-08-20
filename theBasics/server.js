@@ -43,11 +43,40 @@ initMediaSoup() //build our mediasoup server/sfu
 
 // socketIo listeners
 io.on('connect', socket=>{
+    let thisClientProducerTransport = null
     // socket is the client that just connected
-    socket.on('getRtpCap',cb=>{
-        // cb is a callback to run, that will send the args
+    // changed cb to ack, because cb is too generic
+    // ack stand for acknowledge, and is a callback
+    socket.on('getRtpCap',ack=>{
+        // ack is a callback to run, that will send the args
         // back to the client
-        cb(router.rtpCapabilities)
+        ack(router.rtpCapabilities)
+    })
+    socket.on('create-producer-transport', async ack=>{
+        // create a transport! A producer transport
+        thisClientProducerTransport = await router.createWebRtcTransport({
+            enableUdp: true,
+            enableTcp: true, //always use UDP unless we can't
+            preferUdp: true,
+            listenInfos: [
+                {
+                    protocol: 'udp',
+                    ip: '0.0.0.0'
+                },
+                {
+                    protocol: 'tcp',
+                    ip: '0.0.0.0'
+                }
+            ]
+        })
+        console.log(thisClientProducerTransport)
+        const clientTransportParams = {
+            id: thisClientProducerTransport.id,
+            iceParameters: thisClientProducerTransport.iceParameters,
+            iceCandidates: thisClientProducerTransport.iceCandidates,
+            dtlsParameters: thisClientProducerTransport.dtlsParameters,
+        }        
+        ack(clientTransportParams) //what we send back to the client
     })
 })
 
