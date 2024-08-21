@@ -41,7 +41,21 @@ const createProducer = async()=>{
     }
     //ask the socket.io server (signaling) for transport information
     const data = await socket.emitWithAck('create-producer-transport')
-    console.log(data)
+    const { id, iceParameters, iceCandidates,dtlsParameters } = data
+    // console.log(data)
+    // make a transport on the client (producer)!
+    const transport = device.createSendTransport({
+        id, iceParameters, iceCandidates,dtlsParameters
+    })
+    producerTransport = transport
+    // the transport connect event will NOT fire until
+    // we call transport.produce()
+    producerTransport.on('connect',async({dtlsParameters},callback,errback)=>{
+        console.log("Transport connect event has fired!")
+    })
+    producerTransport.on('produce', async(parameters, callback, errback)=>{
+        console.log("Transport produce event has fired!")
+    })
 }
 
 // Socket listners here!
