@@ -4,6 +4,7 @@ let socket = null
 let device = null
 let localStream = null
 let producerTransport = null
+let producer = null
 
 // connect to the server
 const initConnect = ()=>{
@@ -51,11 +52,47 @@ const createProducer = async()=>{
     // the transport connect event will NOT fire until
     // we call transport.produce()
     producerTransport.on('connect',async({dtlsParameters},callback,errback)=>{
-        console.log("Transport connect event has fired!")
+        // console.log("Transport connect event has fired!")
+        // connect comes with local dtlsParameters. We need
+        // to send these up to the server, so we can finish
+        // the connection
+        console.log(dtlsParameters)
+        const resp = await socket.emitWithAck('connect-transport',{dtlsParameters})
+        if(resp === "success"){
+            //calling callback simply lets the app know, the server
+            // succeeded in connecting, so trigger the produce event
+            callback()
+        }else if(resp === "error"){
+            //calling errback simply lets the app know, the server
+            // failed in connecting, so HALT everything
+            errback()
+        }
+        console.log(resp)
     })
     producerTransport.on('produce', async(parameters, callback, errback)=>{
-        console.log("Transport produce event has fired!")
+        // console.log("Transport produce event has fired!")
+        console.log(parameters)
+        const { kind, rtpParameters } = parameters
+        const resp = await socket.emitWithAck('start-producing',{ kind, rtpParameters })
+        if(resp === "error"){
+            //somethign went wrong when the server tried to produce
+            errback()
+        }else{
+            // resp contains an id!
+            callback({id:resp})
+        }
+        // console.log(resp)
+        publishButton.disabled = true
+        createConsButton.disabled = false
     })
+    createProdButton.disabled = true
+    publishButton.disabled = false
+}
+
+const publish = async()=>{
+    // console.log("Publish feed!")
+    const track = localStream.getVideoTracks()[0]
+    producer = await producerTransport.produce({track})
 }
 
 // Socket listners here!

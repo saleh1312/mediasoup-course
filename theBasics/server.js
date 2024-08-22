@@ -44,6 +44,7 @@ initMediaSoup() //build our mediasoup server/sfu
 // socketIo listeners
 io.on('connect', socket=>{
     let thisClientProducerTransport = null
+    let thisClientProducer = null
     // socket is the client that just connected
     // changed cb to ack, because cb is too generic
     // ack stand for acknowledge, and is a callback
@@ -77,6 +78,27 @@ io.on('connect', socket=>{
             dtlsParameters: thisClientProducerTransport.dtlsParameters,
         }        
         ack(clientTransportParams) //what we send back to the client
+    })
+    socket.on('connect-transport',async(dtlsParameters, ack)=>{
+        //get the dtls info from the client, and finish the connection
+        // on success, send success, on fail, send error
+        try{
+            await thisClientProducerTransport.connect(dtlsParameters)
+            ack("success")
+        }catch(error){
+            // something went wrong. Log it, and send back "err"
+            console.log(error)
+            ack("error")
+        }
+    })
+    socket.on('start-producing',async({kind, rtpParameters}, ack)=>{
+        try{
+            thisClientProducer = await thisClientProducerTransport.produce({kind, rtpParameters})
+            ack(thisClientProducer.id)
+        }catch(error){
+            console.log(error)
+            ack("error")
+        }
     })
 })
 
