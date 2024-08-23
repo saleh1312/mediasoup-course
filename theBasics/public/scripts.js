@@ -5,6 +5,8 @@ let device = null
 let localStream = null
 let producerTransport = null
 let producer = null
+let consumerTransport = null
+let consumer = null
 
 // connect to the server
 const initConnect = ()=>{
@@ -93,6 +95,40 @@ const publish = async()=>{
     // console.log("Publish feed!")
     const track = localStream.getVideoTracks()[0]
     producer = await producerTransport.produce({track})
+}
+
+const createConsumer = async()=>{
+    //ask the socket.io server (signaling) for transport information
+    const data = await socket.emitWithAck('create-consumer-transport')
+    const { id, iceParameters, iceCandidates,dtlsParameters } = data
+    // console.log(data)
+    // make a transport on the client (producer)!
+    const transport = device.createRecvTransport({
+        id, iceParameters, iceCandidates,dtlsParameters
+    })
+    consumerTransport = transport
+    // the transport connect event will NOT fire until
+    // we call transport.consume()
+    consumerTransport.on('connect',async({dtlsParameters},callback,errback)=>{
+        // console.log("Transport connect event has fired!")
+        // connect comes with local dtlsParameters. We need
+        // to send these up to the server, so we can finish
+        // the connection
+        // console.log(dtlsParameters)
+        const resp = await socket.emitWithAck('connect-consumer-transport',{dtlsParameters})
+        if(resp === "success"){
+            //calling callback simply lets the app know, the server
+            // succeeded in connecting, so trigger the produce event
+            callback()
+        }else if(resp === "error"){
+            //calling errback simply lets the app know, the server
+            // failed in connecting, so HALT everything
+            errback()
+        }
+        console.log(resp)
+    })
+    createConsButton.disabled = true
+    consumeButton.disabled = false
 }
 
 // Socket listners here!

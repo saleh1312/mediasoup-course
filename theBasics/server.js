@@ -18,6 +18,7 @@ const mediasoup = require('mediasoup')
 
 const config = require('./config/config')
 const createWorkers = require('./createWorkers')
+const createWebRtcTransportBothKinds = require('./createWebRtcTransportBothKinds')
 
 //set up the socketio server, listening by way of our express https sever
 const io = socketio(httpsServer,{
@@ -45,6 +46,8 @@ initMediaSoup() //build our mediasoup server/sfu
 io.on('connect', socket=>{
     let thisClientProducerTransport = null
     let thisClientProducer = null
+    let thisClientConsumerTransport = null
+    let thisClientConsumer = null    
     // socket is the client that just connected
     // changed cb to ack, because cb is too generic
     // ack stand for acknowledge, and is a callback
@@ -55,28 +58,8 @@ io.on('connect', socket=>{
     })
     socket.on('create-producer-transport', async ack=>{
         // create a transport! A producer transport
-        thisClientProducerTransport = await router.createWebRtcTransport({
-            enableUdp: true,
-            enableTcp: true, //always use UDP unless we can't
-            preferUdp: true,
-            listenInfos: [
-                {
-                    protocol: 'udp',
-                    ip: '0.0.0.0'
-                },
-                {
-                    protocol: 'tcp',
-                    ip: '0.0.0.0'
-                }
-            ]
-        })
-        console.log(thisClientProducerTransport)
-        const clientTransportParams = {
-            id: thisClientProducerTransport.id,
-            iceParameters: thisClientProducerTransport.iceParameters,
-            iceCandidates: thisClientProducerTransport.iceCandidates,
-            dtlsParameters: thisClientProducerTransport.dtlsParameters,
-        }        
+        const {transport,clientTransportParams} = await createWebRtcTransportBothKinds(router)
+        thisClientProducerTransport = transport
         ack(clientTransportParams) //what we send back to the client
     })
     socket.on('connect-transport',async(dtlsParameters, ack)=>{
@@ -100,6 +83,24 @@ io.on('connect', socket=>{
             ack("error")
         }
     })
+    socket.on('create-consumer-transport', async ack=>{
+        // create a transport! A producer transport
+        const {transport,clientTransportParams} = await createWebRtcTransportBothKinds(router)
+        thisClientConsumerTransport = transport
+        ack(clientTransportParams) //what we send back to the client
+    })    
+    socket.on('connect-consumer-transport',async(dtlsParameters, ack)=>{
+        //get the dtls info from the client, and finish the connection
+        // on success, send success, on fail, send error
+        try{
+            await thisClientConsumerTransport.connect(dtlsParameters)
+            ack("success")
+        }catch(error){
+            // something went wrong. Log it, and send back "err"
+            console.log(error)
+            ack("error")
+        }
+    })    
 })
 
 httpsServer.listen(config.port)
