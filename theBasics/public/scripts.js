@@ -107,6 +107,10 @@ const createConsumer = async()=>{
         id, iceParameters, iceCandidates,dtlsParameters
     })
     consumerTransport = transport
+    consumerTransport.on('connectionstatechange',state=>{
+        console.log("....connection state change....")
+        console.log(state)
+    })
     // the transport connect event will NOT fire until
     // we call transport.consume()
     consumerTransport.on('connect',async({dtlsParameters},callback,errback)=>{
@@ -144,6 +148,20 @@ const consume = async()=>{
         consumer = await consumerTransport.consume(consumerParams)
         const {track} = consumer
         console.log(track)
+
+        //listen for various track events
+        track.addEventListener("ended", () => {
+            console.log("Track has ended")
+        });
+        
+        track.onmute = (event) => {
+            console.log("Track has muted")
+          };
+          
+        track.onunmute = (event) => {
+            console.log("Track has unmuted")
+        };   
+
         // see MDN on MediaStream for A TON more information
         remoteVideo.srcObject = new MediaStream([track])
         console.log("Track is ready... we need to unpause")
