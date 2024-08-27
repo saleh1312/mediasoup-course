@@ -28,6 +28,7 @@ const deviceSetup = async()=>{
 //     console.log(device.loaded)
     deviceButton.disabled = true
     createProdButton.disabled = false
+    createConsButton.disabled = false
 }
 
 const createProducer = async()=>{
@@ -35,7 +36,7 @@ const createProducer = async()=>{
     try{
         localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
-            audio: true,
+            audio: false,
         })
         console.log(localStream)
         localVideo.srcObject = localStream

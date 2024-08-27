@@ -30,6 +30,8 @@ const io = socketio(httpsServer,{
 let workers = null
 // init router, it's where our 1 router will live
 let router = null
+// theProducer will be a global, and whoever produced last
+let theProducer = null
 
 //initMediaSoup gets mediasoup ready to do its thing
 const initMediaSoup = async()=>{
@@ -77,6 +79,7 @@ io.on('connect', socket=>{
     socket.on('start-producing',async({kind, rtpParameters}, ack)=>{
         try{
             thisClientProducer = await thisClientProducerTransport.produce({kind, rtpParameters})
+            theProducer = thisClientProducer
             ack(thisClientProducer.id)
         }catch(error){
             console.log(error)
@@ -105,20 +108,20 @@ io.on('connect', socket=>{
         // we will set up our clientConsumer, and send back
         // the params the client needs to do the same
         // make sure there is a producer :) we can't consume without one
-        if(!thisClientProducer){
+        if(!theProducer){
             ack("noProducer")
-        }else if(!router.canConsume({producerId:thisClientProducer.id,rtpCapabilities})){
+        }else if(!router.canConsume({producerId:theProducer.id,rtpCapabilities})){
             ack("cannotConsume")
         }else{
             // we can consume... there is a producer and client is able.
             // proceed!
             thisClientConsumer = await thisClientConsumerTransport.consume({
-                producerId: thisClientProducer.id,
+                producerId: theProducer.id,
                 rtpCapabilities,
                 paused: true, //see docs, this is usually the best way to start
             })
             const consumerParams = {
-                producerId: thisClientProducer.id,
+                producerId: theProducer.id,
                 id: thisClientConsumer.id,
                 kind:thisClientConsumer.kind,
                 rtpParameters: thisClientConsumer.rtpParameters,
