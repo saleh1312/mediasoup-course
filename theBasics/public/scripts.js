@@ -111,6 +111,10 @@ const createConsumer = async()=>{
         console.log("....connection state change....")
         console.log(state)
     })
+    consumerTransport.on('icegatheringstatechange',state=>{
+        console.log("....ice gathering change....")
+        console.log(state)
+    })    
     // the transport connect event will NOT fire until
     // we call transport.consume()
     consumerTransport.on('connect',async({dtlsParameters},callback,errback)=>{
