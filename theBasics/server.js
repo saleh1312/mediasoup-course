@@ -22,7 +22,8 @@ const createWebRtcTransportBothKinds = require('./createWebRtcTransportBothKinds
 
 //set up the socketio server, listening by way of our express https sever
 const io = socketio(httpsServer,{
-    cors: [`https://localhost:${config.port}`]
+    cors: [`https://localhost:${config.port}`],
+    cors: [`https://192.168.1.44`]
 })
 
 //our globals
@@ -80,6 +81,10 @@ io.on('connect', socket=>{
         try{
             thisClientProducer = await thisClientProducerTransport.produce({kind, rtpParameters})
             theProducer = thisClientProducer
+            thisClientProducer.on('transportclose',()=>{
+                console.log("Producer transport closed. Just fyi")
+                thisClientProducer.close()
+            })            
             ack(thisClientProducer.id)
         }catch(error){
             console.log(error)
@@ -120,6 +125,10 @@ io.on('connect', socket=>{
                 rtpCapabilities,
                 paused: true, //see docs, this is usually the best way to start
             })
+            thisClientConsumer.on('transportclose',()=>{
+                console.log("Consumer transport closed. Just fyi")
+                thisClientConsumer.close()
+            })
             const consumerParams = {
                 producerId: theProducer.id,
                 id: thisClientConsumer.id,
@@ -131,6 +140,16 @@ io.on('connect', socket=>{
     })
     socket.on('unpauseConsumer',async ack=>{
         await thisClientConsumer.resume()
+    })
+    socket.on('close-all',ack=>{
+        // client has requested to close ALL
+        try{
+            thisClientConsumerTransport?.close()
+            thisClientProducerTransport?.close()
+            ack("closed")
+        }catch(error){
+            ack("closeError")
+        }
     })
 })
 

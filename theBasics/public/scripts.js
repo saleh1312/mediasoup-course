@@ -29,6 +29,7 @@ const deviceSetup = async()=>{
     deviceButton.disabled = true
     createProdButton.disabled = false
     createConsButton.disabled = false
+    disconnectButton.disabled = false
 }
 
 const createProducer = async()=>{
@@ -172,6 +173,19 @@ const consume = async()=>{
         console.log("Track is ready... we need to unpause")
         await socket.emitWithAck('unpauseConsumer')
     }
+}
+
+const disconnect = async()=>{
+    // we want to close EVERYTHING. Right now. :)
+    // send a message to the server, then close here
+    const closedResp = await socket.emitWithAck('close-all')
+    if(closedResp === "closeError"){
+        console.log("Something happened on the server...")
+    }
+    // it doesn't matter if the server didn't close, we are closing.
+    // Now.
+    producerTransport?.close()
+    consumerTransport?.close()
 }
 
 // Socket listners here!
