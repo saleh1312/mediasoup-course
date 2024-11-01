@@ -29,6 +29,6 @@ body{
   left: 45%;
 }
 
-#control-buttons{
+#room-info, #control-buttons{
   margin: 15px 0;
 }
