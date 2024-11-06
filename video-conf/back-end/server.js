@@ -1,5 +1,6 @@
 const fs = require('fs') //we need this to read our keys. Part of node
 const https = require('https') //we need this for a secure express server. part of node
+const http = require('http') 
 //express sets up the http server and serves our front end
 const express = require('express')
 const app = express()
@@ -11,7 +12,9 @@ const key = fs.readFileSync('./config/cert.key')
 const cert = fs.readFileSync('./config/cert.crt')
 const options = {key,cert}
 //use those keys with the https module to have https
-const httpsServer = https.createServer(options, app)
+// const httpsServer = https.createServer(options, app)
+//FOR LOCAL ONlY... non https
+const httpServer = http.createServer(app)
 
 const socketio = require('socket.io')
 const mediasoup = require('mediasoup')
@@ -20,8 +23,10 @@ const config = require('./config/config')
 const createWorkers = require('./createWorkers')
 
 //set up the socketio server, listening by way of our express https sever
-const io = socketio(httpsServer,{
-    cors: [`https://localhost:${config.port}`],
+// const io = socketio(httpsServer,{
+const io = socketio(httpServer,{
+    cors: [`https://localhost:5173`],
+    cors: [`http://localhost:5173`],
     cors: [`https://192.168.1.44`]
 })
 
@@ -47,4 +52,5 @@ io.on('connect', socket=>{
 
 })
 
-httpsServer.listen(config.port)
+// httpsServer.listen(config.port)
+httpServer.listen(config.port)
