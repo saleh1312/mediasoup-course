@@ -21,6 +21,8 @@ const mediasoup = require('mediasoup')
 
 const config = require('./config/config')
 const createWorkers = require('./createWorkers')
+const Client = require('./classes/Client')
+const Room = require('./classes/Room')
 
 //set up the socketio server, listening by way of our express https sever
 // const io = socketio(httpsServer,{
@@ -49,7 +51,13 @@ initMediaSoup() //build our mediasoup server/sfu
 
 // socketIo listeners
 io.on('connect', socket=>{
-
+    // this is where this client/user/socket lives!
+    let client; //this client object available to all our socket listeners
+    const handshake = socket.handshake //socket.handshake is where auth and query live
+    //you could now check handshake for password, auth, etc.
+    socket.on('joinRoom',({userName,roomName})=>{
+        client = new Client(userName,socket)
+    })
 })
 
 // httpsServer.listen(config.port)

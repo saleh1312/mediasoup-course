@@ -10,10 +10,11 @@ socket.on('connect',()=>{
   console.log("Connected")
 })
 
-const joinRoom = ()=>{
+const joinRoom = async()=>{
   // console.log("Join room!")
   const userName = document.getElementById('username').value
   const roomName = document.getElementById('room-input').value
+  const joinRoomResp = await socket.emitWithAck('joinRoom',{userName,roomName})
 }
 
 buttons.joinRoom.addEventListener('click',joinRoom)
