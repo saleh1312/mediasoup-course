@@ -56,7 +56,7 @@ io.on('connect', socket=>{
     const handshake = socket.handshake //socket.handshake is where auth and query live
     //you could now check handshake for password, auth, etc.
     socket.on('joinRoom',({userName,roomName})=>{
-        client = new Client(userName,socket)
+        client = new Client(userName,socket,router)
     })
 })
 
