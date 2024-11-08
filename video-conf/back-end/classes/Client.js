@@ -1,5 +1,5 @@
 class Client{
-    constructor(userName,socket,router){
+    constructor(userName,socket){
         this.userName = userName
         this.socket = socket
         //instead of calling this producerTransport, call it upstream, THIS client's transport
@@ -12,7 +12,6 @@ class Client{
         this.downstreamTransports = []
         //an array of consumers, each with 2 parts
         this.consumers = []
-        this.router = router
         // this.rooms = []
         this.room = null // this will be a Room object
     }

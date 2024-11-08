@@ -20,7 +20,8 @@ const socketio = require('socket.io')
 const mediasoup = require('mediasoup')
 
 const config = require('./config/config')
-const createWorkers = require('./createWorkers')
+const createWorkers = require('./utilities/createWorkers')
+const getWorker = require('./utilities/getWorker')
 const Client = require('./classes/Client')
 const Room = require('./classes/Room')
 
@@ -35,16 +36,15 @@ const io = socketio(httpServer,{
 //our globals
 //init workers, it's where our mediasoup workers will live
 let workers = null
-// init router, it's where our 1 router will live
-let router = null
+// router is now managed by the Room object
+// master rooms array that contains all our Room object
+const rooms = []
 
 //initMediaSoup gets mediasoup ready to do its thing
 const initMediaSoup = async()=>{
     workers = await createWorkers()
     // console.log(workers)
-    router = await workers[0].createRouter({
-        mediaCodecs: config.routerMediaCodecs
-    })
+
 }
 
 initMediaSoup() //build our mediasoup server/sfu
@@ -55,8 +55,31 @@ io.on('connect', socket=>{
     let client; //this client object available to all our socket listeners
     const handshake = socket.handshake //socket.handshake is where auth and query live
     //you could now check handshake for password, auth, etc.
-    socket.on('joinRoom',({userName,roomName})=>{
-        client = new Client(userName,socket,router)
+    socket.on('joinRoom', async({userName,roomName},ackCb)=>{
+        let newRoom = false
+        client = new Client(userName,socket)
+        let requestedRoom = rooms.find(room=> room.roomName === roomName)
+        if(!requestedRoom){
+            newRoom = true
+            // make the new room, add a worker, add a router
+            const workerToUse = await getWorker(workers)
+            requestedRoom = new Room(roomName,workerToUse)
+            await requestedRoom.createRouter()
+            rooms.push(requestedRoom)
+        }
+        // add the room to the client
+        client.room = requestedRoom
+        // add the client to the Room clients
+        client.room.addClient(client)
+        // add this socket to the socket room
+        socket.join(client.room.roomName)
+
+        // PLACEHOLDER... 6. Eventually, we will need to get all current producers... come back to this!
+
+        ackCb({
+            routerRtpCapabilities: client.room.router.rtpCapabilities,
+            newRoom,
+        })
     })
 })
 

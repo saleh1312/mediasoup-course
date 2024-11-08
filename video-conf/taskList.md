@@ -12,3 +12,12 @@
 5. Add this socket to the socket.io room for communication
 6. Eventually, we will need to get all current producers... come back to this!
 7. Send back routerCapabilities, and speakers/producers
+
+## client gets joinRoom response
+1. Load device
+2. Eventually, start building transports for current producers
+3. Display control buttons
+
+## user clicks feedOn button
+1. getUserMedia
+2. Enable control buttons
