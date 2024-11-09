@@ -2,6 +2,7 @@ import './style.css'
 import buttons from './uiStuff/uiButtons'
 import { io } from 'socket.io-client'
 import { Device } from 'mediasoup-client'
+import getMic2 from './getMic2'
 
 let device = null
 

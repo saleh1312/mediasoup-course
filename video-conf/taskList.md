@@ -20,4 +20,5 @@
 
 ## user clicks feedOn button
 1. getUserMedia
-2. Enable control buttons
+2. add video to local video box
+3. Enable control buttons
