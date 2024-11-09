@@ -20,5 +20,6 @@
 
 ## user clicks feedOn button
 1. getUserMedia
+    - Note: I have to pull 2nd mic, you do not
 2. add video to local video box
 3. Enable control buttons

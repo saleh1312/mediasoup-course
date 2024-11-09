@@ -5,6 +5,7 @@ import { Device } from 'mediasoup-client'
 import getMic2 from './getMic2'
 
 let device = null
+let localStream = null
 
 // const socket = io.connect('https://localhost:3031')
 //FOR LOCAL ONLY... no https
@@ -27,4 +28,18 @@ const joinRoom = async()=>{
   buttons.control.classList.remove('d-none')
 }
 
+const enableFeed = async()=>{
+  const mic2Id = await getMic2() //this is for me!
+  localStream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    // audio: true,
+    audio: {deviceId:{exact:mic2Id}}, //this is for me!
+  })
+  buttons.localMediaLeft.srcObject = localStream
+  buttons.enableFeed.disabled = true
+  buttons.sendFeed.disabled = false
+  buttons.muteBtn.disabled = false
+}
+
 buttons.joinRoom.addEventListener('click',joinRoom)
+buttons.enableFeed.addEventListener('click',enableFeed)
