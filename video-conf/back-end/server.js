@@ -81,6 +81,19 @@ io.on('connect', socket=>{
             newRoom,
         })
     })
+    socket.on('requestTransport',async({type},ackCb)=>{
+        // whether producer or consumer, client needs params
+        let clientTransportParams
+        if(type === "producer"){
+            // run addClient, which is part of our Client class
+            clientTransportParams = await client.addTransport(type)
+        }else if(type === "consumer"){
+
+        }
+        ackCb(clientTransportParams)
+    })
+
+
 })
 
 // httpsServer.listen(config.port)

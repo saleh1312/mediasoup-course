@@ -42,7 +42,7 @@ const config = {
             parameters : {}
           }        
     ],
-webRtcTransport: {
+    webRtcTransport: {
       listenIps: [
         {
           ip: '127.0.0.1', //anywhere
