@@ -3,9 +3,11 @@ import buttons from './uiStuff/uiButtons'
 import { io } from 'socket.io-client'
 import { Device } from 'mediasoup-client'
 import getMic2 from './getMic2'
+import createProducerTransport from './mediaSoupFunctions/createProducerTransport'
 
 let device = null
 let localStream = null
+let producerTransport = null
 
 // const socket = io.connect('https://localhost:3031')
 //FOR LOCAL ONLY... no https
@@ -41,5 +43,12 @@ const enableFeed = async()=>{
   buttons.muteBtn.disabled = false
 }
 
+const sendFeed = async()=>{
+  //create a transport for THIS client's upstream
+  // it will handle both audio and video producers
+  producerTransport = await createProducerTransport(socket)
+}
+
 buttons.joinRoom.addEventListener('click',joinRoom)
 buttons.enableFeed.addEventListener('click',enableFeed)
+buttons.sendFeed.addEventListener('click',sendFeed)
