@@ -4,6 +4,7 @@ import { io } from 'socket.io-client'
 import { Device } from 'mediasoup-client'
 import getMic2 from './getMic2'
 import createProducerTransport from './mediaSoupFunctions/createProducerTransport'
+import createProducer from './mediaSoupFunctions/createProducer'
 
 let device = null
 let localStream = null
@@ -46,7 +47,10 @@ const enableFeed = async()=>{
 const sendFeed = async()=>{
   //create a transport for THIS client's upstream
   // it will handle both audio and video producers
-  producerTransport = await createProducerTransport(socket)
+  producerTransport = await createProducerTransport(socket,device)
+  // console.log("Have producer transport. Time to produce!")
+  // Create our producers
+  const producers = await createProducer(localStream, producerTransport)
 }
 
 buttons.joinRoom.addEventListener('click',joinRoom)
