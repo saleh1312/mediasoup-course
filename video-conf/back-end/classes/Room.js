@@ -1,4 +1,5 @@
 const config = require('../config/config')
+const newDominantSpeaker = require('../utilities/newDominantSpeaker')
 
 // Rooms are not a MediaSoup thing. MS cares about mediastreams, transports, 
 // things like that. It doesn't care, or know, about rooms. 
@@ -17,11 +18,15 @@ class Room{
     addClient(client){
         this.clients.push(client)
     }
-    createRouter(){
+    createRouter(io){
         return new Promise(async(resolve, reject)=>{
             this.router = await this.worker.createRouter({
                 mediaCodecs: config.routerMediaCodecs
             })
+            this.activeSpeakerObserver = await this.router.createActiveSpeakerObserver({
+                interval: 300 //300 is default
+            })
+            this.activeSpeakerObserver.on('dominantspeaker',ds=>newDominantSpeaker(ds,this,io))
             resolve()
         })
     }

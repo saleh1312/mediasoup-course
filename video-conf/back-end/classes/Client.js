@@ -53,6 +53,15 @@ class Client{
             resolve(clientTransportParams)
         })
     }
+    addProducer(kind,newProducer){
+        this.producer[kind] = newProducer
+        if(kind === "audio"){
+            // add this to our activeSpeakerObserver
+            this.room.activeSpeakerObserver.addProducer({
+                producerId: newProducer.id
+            })
+        }
+    }
 }
 
 module.exports = Client
