@@ -48,3 +48,62 @@
 ### On transport created, create producer
 1. Get video and audio tracks from stream
 2. Start producing both!
+
+## The Hard/Confusing Part - Dominant Speaker & Consumers... who and when?
+- DO NOT BE INTIMIDATED! ONE TASK AT A TIME!
+- If you want to scale, you have to take this part seriously.
+### Consuming:
+- There are two primary use cases for a client to start consuming:
+1. A new client joins and there are already producers.
+2. A new client starts producing, and there are exisiting clients.
+### Dominant Speaker:
+- We will grab the 5 most recent dominant speakers. There are three occasions why this would change: 
+1. A new person becomes the dominant speaker.
+    - This may require a new transport if the new speaker has moved into the top 5 for the first time since a given client has joined
+    - This may just require unpausing a producer if the client has consumed the producer before and it has moved back into the top
+2. A new person starts producing and there are less than 5 in the list.
+    - This ALWAYS means creating a new transport for all clients.
+3. A person hangs up who was in the top 5
+    - Terminate transports/consumers
+
+## Continued: Tasklist for Consuming and Updating 
+### When a client joins a room:
+- We handle Consuming 1
+### When a new client starts producing:
+- We handle consuming 2 and Dominant Speaker 2
+### When a new person is identified as dominant speaker:
+- We handle Dominant Speaker 1
+### When a client hangs up
+- We handle Dominant Speaker 3
+### If clients are consuming a producer that falls out of the top 5, stop.
+
+### Front-end will get a list of all new producers to consume:
+1. on joinRoom
+2. if the server alerts
+
+## Dominant Speaker Tasklist:
+1. Add an activeSpeakerObserver to the room router
+2. listen for the dominantspeaker event
+3. when it occurs, find the room based on the producerId
+4. move that id to the front of that room's activeSpeakerList
+5. alert all sockets in that room (leads to next bullet point!)
+### Alerting sockets tasklist:
+- This will be used for new dominant speaker OR if a new producer appears and there are less than 5 producers
+1. Grab the most recent 5 speakers in activeSpeakerList as current
+2. Grab all other known speakers as muted
+3. Loop through ALL clients
+    - Loop through all clients to mute, calling iteration pid
+        - If client has a consumer that matches pid, mute
+        - If client does not have a consumer that matches pid, do nothing
+    - Create an array to handle a new speaker to the current client
+    - Loop through currentSpeakers
+        - If client has a consumer that matches pid, unpause
+            - This happens because it has consumed before and paused
+        - If no match, and NOT this user, add to newSpeaker array to prepare to create a transport to consume
+    - If there are any pids in newSpeaker array for THIS client, add them to be processed outside of loop
+4. Client loop is done, emit to all connected sockets the new top 5 so front-end can update
+5. Emit to each client who has at least one new transport, the list of producers to start transport/consuming
+- We are storing the audio pid in activeSpeakerList, so that's what we'll have
+- We need to get the cooresponding video pid and the userName for the front-end
+
+

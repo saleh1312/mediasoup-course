@@ -9,6 +9,8 @@ import createProducer from './mediaSoupFunctions/createProducer'
 let device = null
 let localStream = null
 let producerTransport = null
+let videoProducer = null
+let audioProducer = null
 
 // const socket = io.connect('https://localhost:3031')
 //FOR LOCAL ONLY... no https
@@ -51,6 +53,10 @@ const sendFeed = async()=>{
   // console.log("Have producer transport. Time to produce!")
   // Create our producers
   const producers = await createProducer(localStream, producerTransport)
+  audioProducer = producers.audioProducer
+  videoProducer = producers.videoProducer
+  console.log(producers)
+  buttons.hangUp.disabled = false
 }
 
 buttons.joinRoom.addEventListener('click',joinRoom)
