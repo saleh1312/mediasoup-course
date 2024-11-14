@@ -84,8 +84,8 @@
 ## Dominant Speaker Tasklist:
 1. Add an activeSpeakerObserver to the room router
 2. listen for the dominantspeaker event
-3. when it occurs, find the room based on the producerId
-4. move that id to the front of that room's activeSpeakerList
+3. when a new producer is added, add it to the observer
+4. on dominantspeaker event, move that id to the front of that room's activeSpeakerList
 5. alert all sockets in that room (leads to next bullet point!)
 ### Alerting sockets tasklist:
 - This will be used for new dominant speaker OR if a new producer appears and there are less than 5 producers
