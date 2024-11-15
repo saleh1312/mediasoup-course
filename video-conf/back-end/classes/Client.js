@@ -31,9 +31,10 @@ class Client{
             if(maxIncomingBitrate){
                 // maxIncomingBitrate limit the incoming bandwidth from this transport
                 try{
-                    await transport.setMaxIncomingBitRate(maxIncomingBitrate)
+                    await transport.setMaxIncomingBitrate(maxIncomingBitrate)
                 }catch(err){
                     console.log("Error setting bitrate")
+                    console.log(err)
                 }
             }
 

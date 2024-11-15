@@ -120,7 +120,13 @@ io.on('connect', socket=>{
         // PLACEHOLDER 1 - if this is an audiotrack, then this is a new possible speaker
         // PLACEHOLER 2 - if the room is populated, then let the connected peers know someone joined
     })
-
+    socket.on('audioChange',typeOfChange=>{
+        if(typeOfChange === "mute"){
+            client?.producer?.audio?.pause()
+        }else{
+            client?.producer?.audio?.resume()
+        }
+    })
 })
 
 // httpsServer.listen(config.port)
