@@ -18,7 +18,7 @@ const requestTransportToConsume = (consumeData,socket,device)=>{
         const videoPid = consumeData.videoPidsToCreate[i]
         // expecting back transport params for THIS audioPid. Maybe 5 times, maybe 0
         const consumerTransportParams = await socket.emitWithAck('requestTransport',{type:"consumer",audioPid})
-
+        console.log(consumerTransportParams)
     })
 }
 

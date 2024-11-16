@@ -116,4 +116,33 @@
 1. Loop through audio pids
 2. For each one, emit requestTransport event
     - Update server requestTransport
-3. 
+### Server: consumer transport
+1. Update requestTransport to include videoPid
+2. Update Client addTransport method for consumer
+    - Note the downstreamTransports 3 properties
+    1. transport
+    2. associatedProducerAudioPid
+    3. associatedProducerVideoPid
+### Front-end: Create transport with params
+- Same as producer, but a separate file
+1. createRecvTransport on device with params
+2. Optionally add listeners
+3. on.connect listener
+    - Triggers on .consume()
+4. resolve the newTransport
+### Consume!
+1. New file for createConsumer
+2. emit consumerMedia to server
+
+
+
+
+
+
+- once consume has fired on the server, finish on.connect()
+emit connectTransport to the server
+### Server: Create transport with params
+- Update to handle consumer
+1. Find the transport we made for this client to consumer this producer
+2. connect()
+### Front-end: Create transport with params

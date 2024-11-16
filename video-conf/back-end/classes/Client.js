@@ -17,7 +17,7 @@ class Client{
         // this.rooms = []
         this.room = null // this will be a Room object
     }
-    addTransport(type){
+    addTransport(type,audioPid = null, videoPid = null){
         return new Promise(async(resolve, reject)=>{
             const { listenIps, initialAvailableOutgoingBitrate, maxIncomingBitrate} = config.webRtcTransport
             const transport = await this.room.router.createWebRtcTransport({
@@ -59,7 +59,12 @@ class Client{
                 //     }
                 // },1000)                
             }else if(type === "consumer"){
-
+                // add the new transport AND the 2 pids, to downstreamTransports
+                this.downstreamTransports.push({
+                    transport, //will handle both audio and video
+                    associatedVideoPid: videoPid,
+                    associatedAudioPid: audioPid,
+                })
             }
             resolve(clientTransportParams)
         })

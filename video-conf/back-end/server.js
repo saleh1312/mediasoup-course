@@ -79,14 +79,14 @@ io.on('connect', socket=>{
         //find the videoPids and make an array with matching indicies
         // for our audioPids. 
         const videoPidsToCreate = audioPidsToCreate.map(aid=>{
-            const client = client.room.clients.find(c=>c?.producer?.audio?.id === aid)
-            return client?.producer?.video?.id
+            const producingClient = client.room.clients.find(c=>c?.producer?.audio?.id === aid)
+            return producingClient?.producer?.video?.id
         })
         //find the username and make an array with matching indicies
         // for our audioPids/videoPids. 
         const associatedUserNames = audioPidsToCreate.map(aid=>{
-            const client = client.room.clients.find(c=>c?.producer?.audio?.id === aid)
-            return client?.userName
+            const producingClient = client.room.clients.find(c=>c?.producer?.audio?.id === aid)
+            return producingClient?.userName
         })
 
         ackCb({
@@ -97,14 +97,19 @@ io.on('connect', socket=>{
             associatedUserNames
         })
     })
-    socket.on('requestTransport',async({type},ackCb)=>{
+    socket.on('requestTransport',async({type,audioPid},ackCb)=>{
         // whether producer or consumer, client needs params
         let clientTransportParams
         if(type === "producer"){
             // run addClient, which is part of our Client class
             clientTransportParams = await client.addTransport(type)
         }else if(type === "consumer"){
-
+            // we have 1 trasnport per client we are streaming from
+            // each trasnport will have an audio and a video producer/consumer
+            // we know the audio Pid (because it came from dominantSpeaker), get the video
+            const producingClient = client.room.clients.find(c=>c?.producer?.audio?.id === audioPid)
+            const videoPid = producingClient?.producer?.video?.id
+            clientTransportParams = await client.addTransport(type,audioPid,videoPid)
         }
         ackCb(clientTransportParams)
     })

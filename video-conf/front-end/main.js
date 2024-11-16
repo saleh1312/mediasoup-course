@@ -28,8 +28,8 @@ const joinRoom = async()=>{
   // console.log(joinRoomResp)
   device = new Device()
   await device.load({routerRtpCapabilities: joinRoomResp.routerRtpCapabilities})
-  console.log(device)
-
+  // console.log(device)
+  console.log(joinRoomResp)
   // joinRoomResp contains arrays for:
     // audioPidsToCreate
     // mapped to videoPidsToCreate
