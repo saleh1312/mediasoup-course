@@ -74,11 +74,27 @@ io.on('connect', socket=>{
         // add this socket to the socket room
         socket.join(client.room.roomName)
 
-        // PLACEHOLDER... 6. Eventually, we will need to get all current producers... come back to this!
+        //fetch the first 0-5 pids in activeSpeakerList
+        const audioPidsToCreate = client.room.activeSpeakerList.slice(0,5)
+        //find the videoPids and make an array with matching indicies
+        // for our audioPids. 
+        const videoPidsToCreate = audioPidsToCreate.map(aid=>{
+            const client = client.room.clients.find(c=>c?.producer?.audio?.id === aid)
+            return client?.producer?.video?.id
+        })
+        //find the username and make an array with matching indicies
+        // for our audioPids/videoPids. 
+        const associatedUserNames = audioPidsToCreate.map(aid=>{
+            const client = client.room.clients.find(c=>c?.producer?.audio?.id === aid)
+            return client?.userName
+        })
 
         ackCb({
             routerRtpCapabilities: client.room.router.rtpCapabilities,
             newRoom,
+            audioPidsToCreate,
+            videoPidsToCreate,
+            associatedUserNames
         })
     })
     socket.on('requestTransport',async({type},ackCb)=>{

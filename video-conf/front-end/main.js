@@ -5,6 +5,7 @@ import { Device } from 'mediasoup-client'
 import getMic2 from './getMic2'
 import createProducerTransport from './mediaSoupFunctions/createProducerTransport'
 import createProducer from './mediaSoupFunctions/createProducer'
+import requestTransportToConsume from './mediaSoupFunctions/requestTransportToConsume'
 
 let device = null
 let localStream = null
@@ -28,8 +29,15 @@ const joinRoom = async()=>{
   device = new Device()
   await device.load({routerRtpCapabilities: joinRoomResp.routerRtpCapabilities})
   console.log(device)
-  
-  //PLACEHOLDER... start making the transports for current speakers
+
+  // joinRoomResp contains arrays for:
+    // audioPidsToCreate
+    // mapped to videoPidsToCreate
+    // mapped to usernames
+  //These arrays, may be empty... they may have a max of 5 indicies
+  requestTransportToConsume(joinRoomResp,socket,device)
+
+
   buttons.control.classList.remove('d-none')
 }
 

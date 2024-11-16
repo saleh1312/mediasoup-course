@@ -106,4 +106,14 @@
 - We are storing the audio pid in activeSpeakerList, so that's what we'll have
 - We need to get the cooresponding video pid and the userName for the front-end
 
-
+## Consume on joinRoom
+### Server side: joinRoom socket event
+1. Get up to the 5 most recent speakers from activeSpeakerList
+2. Map through room clients to find the cooresponding video pid
+3. Map through room clients to find the cooresponding username (can combine with above)
+4. Send back these 3 arrays
+### Front end: requestTransportsToConsume
+1. Loop through audio pids
+2. For each one, emit requestTransport event
+    - Update server requestTransport
+3. 
