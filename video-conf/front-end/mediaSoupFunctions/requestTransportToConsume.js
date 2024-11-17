@@ -1,3 +1,5 @@
+import createConsumer from "./createConsumer"
+import createConsumerTransport from "./createConsumerTransport"
 
 const requestTransportToConsume = (consumeData,socket,device)=>{
     //how many transports? One for each consumer? 
@@ -19,6 +21,13 @@ const requestTransportToConsume = (consumeData,socket,device)=>{
         // expecting back transport params for THIS audioPid. Maybe 5 times, maybe 0
         const consumerTransportParams = await socket.emitWithAck('requestTransport',{type:"consumer",audioPid})
         console.log(consumerTransportParams)
+        const consumerTransport = createConsumerTransport(consumerTransportParams,device,socket,audioPid)
+        const [audioConsumer,videoConsumer] = await Promise.all([
+            createConsumer(consumerTransport,audioPid,device,socket,'audio',i),
+            createConsumer(consumerTransport,videoPid,device,socket,'video',i)
+        ])
+        console.log(audioConsumer)
+        console.log(videoConsumer)
     })
 }
 

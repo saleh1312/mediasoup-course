@@ -129,12 +129,14 @@
 2. Optionally add listeners
 3. on.connect listener
     - Triggers on .consume()
-4. resolve the newTransport
+4. return the newTransport
 ### Consume!
 1. New file for createConsumer
-2. emit consumerMedia to server
-
-
+2. emit consumeMedia to server
+### Server: consumeMedia
+1. Find the producing client with the pid (could be audio or video)
+2. Confirm we can consume with canConsume
+3. 
 
 
 
