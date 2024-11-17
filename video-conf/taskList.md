@@ -134,20 +134,17 @@
 1. New file for createConsumer
 2. emit consumeMedia to server
 ### Server: consumeMedia
-1. Find the producing client with the pid (could be audio or video)
-2. Confirm we can consume with canConsume
-3. Find the transport from the consuming client's downstreamTransport
-4. Run consume!
-5. addConsumer method in Client
-6. Get and send back consumerParams to front-end
-
-
-
-
-- once consume has fired on the server, finish on.connect()
-emit connectTransport to the server
-### Server: Create transport with params
-- Update to handle consumer
-1. Find the transport we made for this client to consumer this producer
-2. connect()
-### Front-end: Create transport with params
+1. Confirm we can consume with canConsume
+2. Find the transport from the consuming client's downstreamTransports
+3. Run consume!
+4. addConsumer method in Client
+5. Get and send back consumerParams to front-end
+### Front-end: consume, connect, load video!
+- Note: Follow the process
+1. Handle consumerParams erro responses
+2. Consume 
+3. Emit connectTransport in the connect event.
+4. callback or errback
+5. Get track (back in createConsumer)
+6. Unpause
+7. Combine streams and add to video tag!

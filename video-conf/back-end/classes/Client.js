@@ -12,8 +12,16 @@ class Client{
         //instead of calling this consumerTransport, call it downstream, 
         // THIS client's transport for pulling data
         this.downstreamTransports = []
+        // {
+            // transport, 
+            // associatedVideoPid
+            // associatedAudioPid
+            // audio = audioProducer
+            // video  = videoProducer
+        // }
+
         //an array of consumers, each with 2 parts
-        this.consumers = []
+        // this.consumers = []
         // this.rooms = []
         this.room = null // this will be a Room object
     }
@@ -77,6 +85,9 @@ class Client{
                 producerId: newProducer.id
             })
         }
+    }
+    addConsumer(kind,newConsumer,downstreamTransport){
+        downstreamTransport[kind] = newConsumer
     }
 }
 
