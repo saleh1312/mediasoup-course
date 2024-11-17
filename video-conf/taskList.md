@@ -136,7 +136,10 @@
 ### Server: consumeMedia
 1. Find the producing client with the pid (could be audio or video)
 2. Confirm we can consume with canConsume
-3. 
+3. Find the transport from the consuming client's downstreamTransport
+4. Run consume!
+5. addConsumer method in Client
+6. Get and send back consumerParams to front-end
 
 
 
