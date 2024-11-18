@@ -16,8 +16,8 @@ class Client{
             // transport, 
             // associatedVideoPid
             // associatedAudioPid
-            // audio = audioProducer
-            // video  = videoProducer
+            // audio = audioConsumer
+            // video  = videoConsumer
         // }
 
         //an array of consumers, each with 2 parts

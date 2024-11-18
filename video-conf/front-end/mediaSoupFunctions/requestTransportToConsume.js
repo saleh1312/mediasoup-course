@@ -1,7 +1,7 @@
 import createConsumer from "./createConsumer"
 import createConsumerTransport from "./createConsumerTransport"
 
-const requestTransportToConsume = (consumeData,socket,device)=>{
+const requestTransportToConsume = (consumeData,socket,device,consumers)=>{
     //how many transports? One for each consumer? 
     // Or one that handles all consumers?
         //if we do one for every consumer, it will mean we can do 
@@ -28,6 +28,19 @@ const requestTransportToConsume = (consumeData,socket,device)=>{
         ])
         console.log(audioConsumer)
         console.log(videoConsumer)
+        // create a new MediaStream on the client with both tracks
+        // This is why we have gone through all this pain!!!
+        const combinedStream = new MediaStream([audioConsumer?.track,videoConsumer?.track])
+        const remoteVideo = document.getElementById(`remote-video-${i}`)
+        remoteVideo.srcObject = combinedStream
+        console.log('Hope this works...')
+        consumers[audioPid] = {
+            combinedStream,
+            userName: consumeData.associatedUserNames[i],
+            consumerTransport,
+            audioConsumer,
+            videoConsumer
+        }
     })
 }
 

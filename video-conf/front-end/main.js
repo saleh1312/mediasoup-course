@@ -12,6 +12,7 @@ let localStream = null
 let producerTransport = null
 let videoProducer = null
 let audioProducer = null
+let consumers = {} //key off the audioPid
 
 // const socket = io.connect('https://localhost:3031')
 //FOR LOCAL ONLY... no https
@@ -35,7 +36,7 @@ const joinRoom = async()=>{
     // mapped to videoPidsToCreate
     // mapped to usernames
   //These arrays, may be empty... they may have a max of 5 indicies
-  requestTransportToConsume(joinRoomResp,socket,device)
+  requestTransportToConsume(joinRoomResp,socket,device,consumers)
 
 
   buttons.control.classList.remove('d-none')

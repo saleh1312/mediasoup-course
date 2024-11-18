@@ -113,7 +113,7 @@ io.on('connect', socket=>{
         }
         ackCb(clientTransportParams)
     })
-    socket.on('connectTransport',async({dtlsParameters,type},ackCb)=>{
+    socket.on('connectTransport',async({dtlsParameters,type,audioPid},ackCb)=>{
         if(type === "producer"){
             try{
                 await client.upstreamTransport.connect({dtlsParameters}) 
@@ -123,7 +123,17 @@ io.on('connect', socket=>{
                 ackCb('error')
             }
         }else if(type === "consumer"){
-
+            // find the right transport, for this consumer
+            try{
+                const downstreamTransport = client.downstreamTransports.find(t=>{
+                    return t.associatedAudioPid === audioPid
+                })
+                downstreamTransport.transport.connect({dtlsParameters})
+                ackCb("success")
+            }catch(error){
+                console.log(error)
+                ackCb("error")
+            }
         }
     })
     socket.on('startProducing',async({kind,rtpParameters},ackCb)=>{
@@ -187,6 +197,13 @@ io.on('connect', socket=>{
             console.log(err)
             ackCb('consumeFailed')
         }
+    })
+    socket.on('unpauseConsumer',async({pid,kind},ackCb)=>{
+        const consumerToResume = client.downstreamTransports.find(t=>{
+            return t?.[kind].producerId === pid
+        })
+        await consumerToResume[kind].resume()
+        ackCb()
     })
 })
 

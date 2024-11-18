@@ -141,7 +141,7 @@
 5. Get and send back consumerParams to front-end
 ### Front-end: consume, connect, load video!
 - Note: Follow the process
-1. Handle consumerParams erro responses
+1. Handle consumerParams error responses
 2. Consume 
 3. Emit connectTransport in the connect event.
 4. callback or errback
