@@ -155,3 +155,4 @@
 ### updateActiveSpeakers function
 - See above: Alerting sockets tasklist
 - We have finally reached our final task!
+- If user has never spoken, but sending feed, add?
