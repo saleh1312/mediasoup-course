@@ -93,10 +93,12 @@
 2. Grab all other known speakers as muted
 3. Loop through ALL clients
     - Loop through all clients to mute, calling iteration pid
+        - Find any producer that is not in the top 5 and pause
         - If client has a consumer that matches pid, mute
         - If client does not have a consumer that matches pid, do nothing
     - Create an array to handle a new speaker to the current client
-    - Loop through currentSpeakers
+    - Loop through currentSpeakers (top 5)
+        - Resume the producer
         - If client has a consumer that matches pid, unpause
             - This happens because it has consumed before and paused
         - If no match, and NOT this user, add to newSpeaker array to prepare to create a transport to consume
@@ -148,3 +150,8 @@
 5. Get track (back in createConsumer)
 6. Unpause
 7. Combine streams and add to video tag!
+
+## On new producer, with populated room
+### updateActiveSpeakers function
+- See above: Alerting sockets tasklist
+- We have finally reached our final task!
