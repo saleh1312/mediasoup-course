@@ -22,6 +22,7 @@ const mediasoup = require('mediasoup')
 const config = require('./config/config')
 const createWorkers = require('./utilities/createWorkers')
 const getWorker = require('./utilities/getWorker')
+const updateActiveSpeakers = require('./utilities/updateActiveSpeakers')
 const Client = require('./classes/Client')
 const Room = require('./classes/Room')
 
@@ -142,14 +143,19 @@ io.on('connect', socket=>{
             const newProducer = await client.upstreamTransport.produce({kind,rtpParameters})
             //add the producer to this client obect
             client.addProducer(kind,newProducer)
+            if(kind === "audio"){
+                client.room.activeSpeakerList.push(newProducer.id)
+            }
             // the front end is waiting for the id
             ackCb(newProducer.id)
         }catch(err){
             console.log(err)
             ackCb(err)
         }
-        // PLACEHOLDER 1 - if this is an audiotrack, then this is a new possible speaker
-        // PLACEHOLER 2 - if the room is populated, then let the connected peers know someone joined
+
+        // run updateActiveSpeakers
+        const newTransportsByPeer = updateActiveSpeakers(client.room,io)
+
     })
     socket.on('audioChange',typeOfChange=>{
         if(typeOfChange === "mute"){

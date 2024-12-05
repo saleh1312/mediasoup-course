@@ -91,7 +91,7 @@
 - This will be used for new dominant speaker OR if a new producer appears and there are less than 5 producers
 1. Grab the most recent 5 speakers in activeSpeakerList as current
 2. Grab all other known speakers as muted
-3. Loop through ALL clients
+3. Loop through ALL clients in this room
     - Loop through all clients to mute, calling iteration pid
         - Find any producer that is not in the top 5 and pause
         - If client has a consumer that matches pid, mute
@@ -103,7 +103,7 @@
             - This happens because it has consumed before and paused
         - If no match, and NOT this user, add to newSpeaker array to prepare to create a transport to consume
     - If there are any pids in newSpeaker array for THIS client, add them to be processed outside of loop
-4. Client loop is done, emit to all connected sockets the new top 5 so front-end can update
+4. Client loop is done, emit to all connected sockets to this room the new top 5 so front-end can update
 5. Emit to each client who has at least one new transport, the list of producers to start transport/consuming
 - We are storing the audio pid in activeSpeakerList, so that's what we'll have
 - We need to get the cooresponding video pid and the userName for the front-end
