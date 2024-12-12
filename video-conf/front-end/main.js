@@ -11,7 +11,7 @@ let device = null
 let localStream = null
 let producerTransport = null
 let videoProducer = null
-let audioProducer = null
+let audioProducer = null //THIS client's producer
 let consumers = {} //key off the audioPid
 
 // const socket = io.connect('https://localhost:3031')
@@ -19,6 +19,39 @@ let consumers = {} //key off the audioPid
 const socket = io.connect('http://localhost:3031')
 socket.on('connect',()=>{
   console.log("Connected")
+})
+
+socket.on('updateActiveSpeakers',async newListOfActives=>{
+  // console.log("updateActiveSpeakers")
+  // console.log(newListOfActives)
+  // an array of the most recent 5 dominant speakers. Just grab the 1st
+    // and put it in the slot. Move everything else down
+    // consumers is an {} with key of audioId, value of combined feed
+    console.log(newListOfActives)
+    let slot = 0
+    // remove all videos from video Els
+    const remoteEls = document.getElementsByClassName('remote-video')
+    for(let el of remoteEls){
+      el.srcObject = null //clear out the <video>
+    }
+    newListOfActives.forEach(aid=>{
+      if(aid !== audioProducer?.id){
+        // do not show THIS client in a video tag, other than local
+        // put this video in the next available slot
+        const remoteVideo = document.getElementById(`remote-video-${slot}`)
+        const remoteVideoUserName = document.getElementById(`username-${slot}`)
+        const consumerForThisSlot = consumers[aid]
+        remoteVideo.srcObject = consumerForThisSlot?.combinedStream
+        remoteVideoUserName.innerHTML = consumerForThisSlot?.userName
+        slot++ //for the next 
+      }
+    })
+})
+
+socket.on('newProducersToConsume',consumeData=>{
+  // console.log("newProducersToConsume")
+  // console.log(consumeData)
+  requestTransportToConsume(consumeData,socket,device,consumers)
 })
 
 const joinRoom = async()=>{
