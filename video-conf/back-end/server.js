@@ -168,7 +168,7 @@ io.on('connect', socket=>{
                 const producerClient = client.room.clients.find(c=>c?.producer?.audio?.id === aPid)
                 return producerClient?.userName
             })
-            io.to(socketId).emit('newProducersToConsumer',{
+            io.to(socketId).emit('newProducersToConsume',{
                 routerRtpCapabilities: client.room.router.rtpCapabilities,
                 audioPidsToCreate,
                 videoPidsToCreate,

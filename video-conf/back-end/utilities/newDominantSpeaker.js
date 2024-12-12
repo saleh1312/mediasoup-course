@@ -28,7 +28,7 @@ function newDominantSpeaker(ds,room,io){
             const producerClient = room.clients.find(c=>c?.producer?.audio?.id === aPid)
             return producerClient?.userName
         })
-        io.to(socketId).emit('newProducersToConsumer',{
+        io.to(socketId).emit('newProducersToConsume',{
             routerRtpCapabilities: room.router.rtpCapabilities,
             audioPidsToCreate,
             videoPidsToCreate,
