@@ -155,7 +155,27 @@ io.on('connect', socket=>{
 
         // run updateActiveSpeakers
         const newTransportsByPeer = updateActiveSpeakers(client.room,io)
-
+        // newTransportsByPeer is an object, each property is a socket.id that
+        // has transports to make. They are in an array, by pid
+        for(const [socketId, audioPidsToCreate] of Object.entries(newTransportsByPeer)){
+            // we have the audioPidsToCreate this socket needs to create
+            // map the video pids and the username
+            const videoPidsToCreate = audioPidsToCreate.map(aPid=>{
+                const producerClient = client.room.clients.find(c=>c?.producer?.audio?.id === aPid)
+                return producerClient?.producer?.video?.id
+            })
+            const associatedUserNames = audioPidsToCreate.map(aPid=>{
+                const producerClient = client.room.clients.find(c=>c?.producer?.audio?.id === aPid)
+                return producerClient?.userName
+            })
+            io.to(socketId).emit('newProducersToConsumer',{
+                routerRtpCapabilities: client.room.router.rtpCapabilities,
+                audioPidsToCreate,
+                videoPidsToCreate,
+                associatedUserNames,
+                activeSpeakerList: client.room.activeSpeakerList.slice(0,5)
+            })
+        }
     })
     socket.on('audioChange',typeOfChange=>{
         if(typeOfChange === "mute"){
