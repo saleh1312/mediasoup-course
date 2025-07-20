@@ -7,8 +7,8 @@ const app = express()
 app.use(express.static('public'))
 
 //get the keys we made with mkcert
-const key = fs.readFileSync('./config/cert.key')
-const cert = fs.readFileSync('./config/cert.crt')
+const key = fs.readFileSync('./config/create-cert-key.pem')
+const cert = fs.readFileSync('./config/create-cert.pem')
 const options = {key,cert}
 //use those keys with the https module to have https
 const httpsServer = https.createServer(options, app)
